@@ -27,6 +27,7 @@ flask db upgrade  # upgrade to latest revision
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 from sqlalchemy_serializer import SerializerMixin
+from sqlalchemy.orm import validates
 
 
 convention = {
@@ -45,7 +46,7 @@ class Pet(db.Model, SerializerMixin):
     __tablename__ = 'pets'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
+    name = db.Column(db.String, nullable = False, unique = True)
     age = db.Column(db.Integer)
     type = db.Column(db.String)
     owner_id = db.Column(db.Integer, db.ForeignKey('owners.id'))
@@ -61,6 +62,20 @@ class Pet(db.Model, SerializerMixin):
     #         'age': self.age,
     #         'type': self.type
     #     }
+    
+    @validates('age')
+    def validates_not_negative(self, key, new_age):
+        if new_age < 0:
+            # raise error if validation fails
+            raise ValueError(f'{key} cannot be negative')
+        # return value if validation passes
+        return new_age
+    
+    @validates('name')
+    def validates_not_empty(self, key, new_value):
+        if new_value is None or len(new_value) == 0:
+            raise ValueError(f'{key} cannot be empty')
+        return new_value
 
     def __repr__(self) -> str:
         return f"<Pet {self.name} {self.age} {self.type}>"
