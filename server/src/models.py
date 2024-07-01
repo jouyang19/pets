@@ -28,6 +28,8 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
+from flask_bcrypt import  Bcrypt
+from sqlalchemy.ext.hybrid import hybrid_property
 
 
 convention = {
@@ -46,7 +48,7 @@ class Pet(db.Model, SerializerMixin):
     __tablename__ = 'pets'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable = False, unique = True)
+    name = db.Column(db.String, nullable=False)
     age = db.Column(db.Integer)
     type = db.Column(db.String)
     owner_id = db.Column(db.Integer, db.ForeignKey('owners.id'))
@@ -54,6 +56,20 @@ class Pet(db.Model, SerializerMixin):
     owner = db.relationship('Owner', back_populates='pets')
 
     serialize_rules = ['-owner.pets']  # prevents recursive loop
+
+    @validates('age')
+    def validates_not_negative(self, key, new_value):
+        if new_value < 0:
+            # raise error if validation fails
+            raise ValueError(f'{key} cannot be negative')
+        # return value if valdation passes
+        return new_value
+    
+    @validates('name')
+    def validates_not_empty(self, key, new_value):
+        if new_value is None or len(new_value) == 0:
+            raise ValueError(f'{key} cannot be empty')
+        return new_value
 
     # to_dict() gets added by SerializerMixin
     # def to_dict(self):
@@ -93,3 +109,5 @@ class Owner(db.Model, SerializerMixin):
 
     def __repr__(self) -> str:
         return f"<Owner {self.name}>"
+
+

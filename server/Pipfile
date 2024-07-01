@@ -10,6 +10,8 @@ flask-sqlalchemy = "*"
 flask-migrate = "*"
 sqlalchemy-serializer = "*"
 importlib-metadata = "*"
+flask-cors = "*"
+flask-bcrypt = "*"
 
 [dev-packages]
 
