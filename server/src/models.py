@@ -28,8 +28,6 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
-from flask_bcrypt import  Bcrypt
-from sqlalchemy.ext.hybrid import hybrid_property
 
 
 convention = {
@@ -78,20 +76,6 @@ class Pet(db.Model, SerializerMixin):
     #         'age': self.age,
     #         'type': self.type
     #     }
-    
-    @validates('age')
-    def validates_not_negative(self, key, new_age):
-        if new_age < 0:
-            # raise error if validation fails
-            raise ValueError(f'{key} cannot be negative')
-        # return value if validation passes
-        return new_age
-    
-    @validates('name')
-    def validates_not_empty(self, key, new_value):
-        if new_value is None or len(new_value) == 0:
-            raise ValueError(f'{key} cannot be empty')
-        return new_value
 
     def __repr__(self) -> str:
         return f"<Pet {self.name} {self.age} {self.type}>"
@@ -109,5 +93,3 @@ class Owner(db.Model, SerializerMixin):
 
     def __repr__(self) -> str:
         return f"<Owner {self.name}>"
-
-

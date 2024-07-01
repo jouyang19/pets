@@ -111,7 +111,7 @@ def pet_by_id(id):
         db.session.delete(pet)
         db.session.commit()
 
-        return {}, 204
+        return {}, 200
     
 @app.get('/owners')
 def get_all_owners():
